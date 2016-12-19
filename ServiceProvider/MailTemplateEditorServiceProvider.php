@@ -1,23 +1,19 @@
 <?php
-
 /*
-* This file is part of MailTemplateEditor plugin
-*
-* Copyright(c) 2000-2016 LOCKON CO.,LTD. All Rights Reserved.
-* http://www.lockon.co.jp/
-*
-* For the full copyright and license information, please view the LICENSE
-* file that was distributed with this source code.
-*/
+  * This file is part of the MailTemplateEditor plugin
+  *
+  * Copyright (C) 2016 LOCKON CO.,LTD. All Rights Reserved.
+  *
+  * For the full copyright and license information, please view the LICENSE
+  * file that was distributed with this source code.
+  */
 
 namespace Plugin\MailTemplateEditor\ServiceProvider;
 
 use Eccube\Application;
-use Monolog\Handler\FingersCrossed\ErrorLevelActivationStrategy;
-use Monolog\Handler\FingersCrossedHandler;
-use Monolog\Handler\RotatingFileHandler;
-use Monolog\Logger;
+use Eccube\Common\Constant;
 use Plugin\MailTemplateEditor\Form\Type\MailTemplateEditorConfigType;
+use Plugin\MailTemplateEditor\Form\Type\MailTemplateType;
 use Silex\Application as BaseApplication;
 use Silex\ServiceProviderInterface;
 
@@ -26,79 +22,41 @@ class MailTemplateEditorServiceProvider implements ServiceProviderInterface
 
     public function register(BaseApplication $app)
     {
-        // プラグイン用設定画面
-        $app->match('/'.$app['config']['admin_route'].'/plugin/MailTemplateEditor/config', 'Plugin\MailTemplateEditor\Controller\ConfigController::index')->bind('plugin_MailTemplateEditor_config');
+
+        // 管理画面定義
+        $admin = $app['controllers_factory'];
+        // 強制SSL
+        if ($app['config']['force_ssl'] == Constant::ENABLED) {
+            $admin->requireHttps();
+        }
+
+        $admin->match('/plugin/content/mail', 'Plugin\MailTemplateEditor\Controller\MailTemplateController::index')->bind('admin_content_mail');
+        $admin->match('/plugin/content/mail/{name}/edit', 'Plugin\MailTemplateEditor\Controller\MailTemplateController::edit')->bind('admin_content_mail_edit');
+        $admin->put('/plugin/content/mail/{name}/reedit', 'Plugin\MailTemplateEditor\Controller\MailTemplateController::reedit')->bind('admin_content_mail_reedit');
+
+        $app->mount('/'.trim($app['config']['admin_route'], '/').'/', $admin);
 
         // Form
         $app['form.types'] = $app->share($app->extend('form.types', function ($types) use ($app) {
-            $types[] = new MailTemplateEditorConfigType();
+            $types[] = new MailTemplateType();
 
             return $types;
         }));
 
-        // Repository
+        // メッセージ登録
+        $file = __DIR__.'/../Resource/locale/message.'.$app['locale'].'.yml';
+        $app['translator']->addResource('yaml', $file, $app['locale']);
 
-        // Service
-
-        // // メッセージ登録
-        // $app['translator'] = $app->share($app->extend('translator', function ($translator, \Silex\Application $app) {
-        //     $translator->addLoader('yaml', new \Symfony\Component\Translation\Loader\YamlFileLoader());
-        //     $file = __DIR__ . '/../Resource/locale/message.' . $app['locale'] . '.yml';
-        //     if (file_exists($file)) {
-        //         $translator->addResource('yaml', $file, $app['locale']);
-        //     }
-        //     return $translator;
-        // }));
-
-        // load config
-        // $conf = $app['config'];
-        // $app['config'] = $app->share(function () use ($conf) {
-        //     $confarray = array();
-        //     $path_file = __DIR__ . '/../Resource/config/path.yml';
-        //     if (file_exists($path_file)) {
-        //         $config_yml = Yaml::parse(file_get_contents($path_file));
-        //         if (isset($config_yml)) {
-        //             $confarray = array_replace_recursive($confarray, $config_yml);
-        //         }
-        //     }
-
-        //     $constant_file = __DIR__ . '/../Resource/config/constant.yml';
-        //     if (file_exists($constant_file)) {
-        //         $config_yml = Yaml::parse(file_get_contents($constant_file));
-        //         if (isset($config_yml)) {
-        //             $confarray = array_replace_recursive($confarray, $config_yml);
-        //         }
-        //     }
-
-        //     return array_replace_recursive($conf, $confarray);
-        // });
-
-        // ログファイル設定
-
-        $app['monolog.logger.mailtemplateeditor'] = $app->share(function ($app) {
-
-            $logger = new $app['monolog.logger.class']('mailtemplateeditor');
-
-            $filename = $app['config']['root_dir'].'/app/log/mailtemplateeditor.log';
-            $RotateHandler = new RotatingFileHandler($filename, $app['config']['log']['max_files'], Logger::INFO);
-            $RotateHandler->setFilenameFormat(
-                'mailtemplateeditor_{date}',
-                'Y-m-d'
+        // 管理画面メニュー追加
+        $app['config'] = $app->share($app->extend('config', function ($config) {
+            $config['nav'][3]['child'][] = array(
+                'id' => 'mail',
+                'name' => 'メール管理',
+                'url' => 'admin_content_mail',
             );
 
-            $logger->pushHandler(
-                new FingersCrossedHandler(
-                    $RotateHandler,
-                    new ErrorLevelActivationStrategy(Logger::ERROR),
-                    0,
-                    true,
-                    true,
-                    Logger::INFO
-                )
-            );
-
-            return $logger;
-        });
+            return $config;
+        }));
 
     }
 
