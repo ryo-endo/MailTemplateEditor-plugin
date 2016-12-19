@@ -1,0 +1,101 @@
+# for travis-ci
+# see also. https://travis-ci.org
+language: php
+sudo: false
+cache:
+  directories:
+    - vendor
+    - $HOME/.composer/cache
+
+php:
+  - 5.3.3
+  - 5.3
+  - 5.4
+  - 5.5
+  - 5.6
+  - 7.0
+
+  env:
+    # ec-cube master
+    - ECCUBE_VERSION=master DB=mysql USER=root DBNAME=myapp_test DBPASS=' ' DBUSER=root
+    - ECCUBE_VERSION=master DB=pgsql USER=postgres DBNAME=myapp_test DBPASS=password DBUSER=postgres
+    - ECCUBE_VERSION=master DB=sqlite
+    # ec-cube 3.0.9
+    - ECCUBE_VERSION=3.0.9 DB=mysql USER=root DBNAME=myapp_test DBPASS=' ' DBUSER=root
+    - ECCUBE_VERSION=3.0.9 DB=pgsql USER=postgres DBNAME=myapp_test DBPASS=password DBUSER=postgres
+    # ec-cube 3.0.10
+    - ECCUBE_VERSION=3.0.10 DB=mysql USER=root DBNAME=myapp_test DBPASS=' ' DBUSER=root
+    - ECCUBE_VERSION=3.0.10 DB=pgsql USER=postgres DBNAME=myapp_test DBPASS=password DBUSER=postgres
+    # ec-cube 3.0.11
+    - ECCUBE_VERSION=3.0.11 DB=mysql USER=root DBNAME=myapp_test DBPASS=' ' DBUSER=root
+    - ECCUBE_VERSION=3.0.11 DB=pgsql USER=postgres DBNAME=myapp_test DBPASS=password DBUSER=postgres
+    # ec-cube 3.0.12
+    - ECCUBE_VERSION=3.0.12 DB=mysql USER=root DBNAME=myapp_test DBPASS=' ' DBUSER=root
+    - ECCUBE_VERSION=3.0.12 DB=pgsql USER=postgres DBNAME=myapp_test DBPASS=password DBUSER=postgres
+    # ec-cube 3.0.12-p1
+    - ECCUBE_VERSION=3.0.12-p1 DB=mysql USER=root DBNAME=myapp_test DBPASS=' ' DBUSER=root
+    - ECCUBE_VERSION=3.0.12-p1 DB=pgsql USER=postgres DBNAME=myapp_test DBPASS=password DBUSER=postgres
+    - DB=mysql USER=root DBNAME=myapp_test DBPASS=' ' DBUSER=root
+    - DB=pgsql USER=postgres DBNAME=myapp_test DBPASS=password DBUSER=postgres
+    - DB=sqlite
+
+matrix:
+  fast_finish: true
+  exclude:
+  allow_failures:
+    - php: 7.0
+    - php: 5.3.3
+    - PHP: 5.3
+      env: DB=sqlite
+    - PHP: 5.4
+      env: DB=sqlite
+    - PHP: 5.5
+      env: DB=sqlite
+    - PHP: 5.6
+      env: DB=sqlite
+env:
+
+
+install: gem install mailcatcher
+
+before_script:
+ # archive plugin
+  - tar cvzf ${HOME}/${PLUGIN_CODE}.tar.gz ./*
+  # clone ec-cube
+  - git clone https://github.com/EC-CUBE/ec-cube.git
+  - cd ec-cube
+  # checkout version
+  - sh -c "if [ ! '${ECCUBE_VERSION}' = 'master' ]; then  git checkout -b ${ECCUBE_VERSION} refs/tags/${ECCUBE_VERSION}; fi"
+  # update composer
+  - composer selfupdate
+  - composer install --dev --no-interaction -o
+  # install ec-cube
+  - sh -c "if [ '$DB' = 'mysql' ]; then sh ./eccube_install.sh mysql none; fi"
+  - sh -c "if [ '$DB' = 'pgsql' ]; then sh ./eccube_install.sh pgsql none; fi"
+  - sh -c "if [ '$DB' = 'sqlite' ]; then sh ./eccube_install.sh sqlite3 none; fi"
+  # install plugin
+  - php app/console plugin:develop install --path=${HOME}/${PLUGIN_CODE}.tar.gz
+  # enable plugin
+  - php app/console plugin:develop enable --code=${PLUGIN_CODE}
+  # mail catcher
+  - mailcatcher
+
+script:
+  # exec phpunit on ec-cube
+  - phpunit app/Plugin/${PLUGIN_CODE}/Tests
+  - if [[ $TRAVIS_PHP_VERSION =~ ^[7] ]]; then ./vendor/bin/phpunit -c app/Plugin/${PLUGIN_CODE}/phpunit.xml.dist --coverage-clover=coverage.clover ; fi
+
+
+after_script:
+  # disable plugin
+  - php app/console plugin:develop disable --code=${PLUGIN_CODE}
+  # uninstall plugin
+  - php app/console plugin:develop uninstall --code=${PLUGIN_CODE}
+  # re install plugin
+  - php app/console plugin:develop install --code=${PLUGIN_CODE}
+  # re enable plugin
+  - php app/console plugin:develop enable --code=${PLUGIN_CODE}
+
+after_success:
+  # for coveralls
+  - if [[ $TRAVIS_PHP_VERSION =~ ^[7] ]]; then php vendor/bin/coveralls -v -x coverage.clover ; fi
