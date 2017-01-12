@@ -65,9 +65,9 @@ class MailTemplateController extends AbstractController
         }
 
         if (!$tplData) {
-            $app->addError('admin.content.mail.edit.error', 'admin');
+            $app->addError('admin.mailtemplateeditor.mail.edit.error', 'admin');
 
-            return $app->redirect($app->url('admin_content_mail'));
+            return $app->redirect($app->url('plugin_MailTemplateEditor_mail'));
         }
 
         $builder = $app['form.factory']->createBuilder('admin_mail_template');
@@ -93,7 +93,7 @@ class MailTemplateController extends AbstractController
             // twig キャッシュの削除.
             Cache::clear($app, false, true);
 
-            return $app->redirect($app->url('admin_content_mail_edit', array(
+            return $app->redirect($app->url('plugin_MailTemplateEditor_mail_edit', array(
                 'name' => $name,
             )));
         }
@@ -124,9 +124,9 @@ class MailTemplateController extends AbstractController
         }
 
         if (!$tplData) {
-            $app->addError('admin.content.mail.edit.error', 'admin');
+            $app->addError('admin.mailtemplateeditor.mail.edit.error', 'admin');
 
-            return $app->redirect($app->url('admin_content_mail'));
+            return $app->redirect($app->url('plugin_MailTemplateEditor_mail'));
         }
 
         $builder = $app['form.factory']->createBuilder('admin_mail_template');
@@ -141,7 +141,7 @@ class MailTemplateController extends AbstractController
         $fs = new Filesystem();
         $fs->dumpFile($filePath, $tplData);
 
-        $app->addSuccess('admin.content.mail.init.complete', 'admin');
+        $app->addSuccess('admin.mailtemplateeditor.mail.init.complete', 'admin');
 
         return $app->render('MailTemplateEditor/Resource/template/admin/mail_edit.twig', array(
             'name' => $name,

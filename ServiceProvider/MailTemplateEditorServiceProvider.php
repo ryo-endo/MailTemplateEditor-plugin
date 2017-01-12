@@ -30,9 +30,9 @@ class MailTemplateEditorServiceProvider implements ServiceProviderInterface
             $admin->requireHttps();
         }
 
-        $admin->match('/plugin/content/mail', 'Plugin\MailTemplateEditor\Controller\MailTemplateController::index')->bind('admin_content_mail');
-        $admin->match('/plugin/content/mail/{name}/edit', 'Plugin\MailTemplateEditor\Controller\MailTemplateController::edit')->bind('admin_content_mail_edit');
-        $admin->put('/plugin/content/mail/{name}/reedit', 'Plugin\MailTemplateEditor\Controller\MailTemplateController::reedit')->bind('admin_content_mail_reedit');
+        $admin->match('/plugin/mailtemplateeditor/mail', 'Plugin\MailTemplateEditor\Controller\MailTemplateController::index')->bind('plugin_MailTemplateEditor_mail');
+        $admin->match('/plugin/mailtemplateeditor/mail/{name}/edit', 'Plugin\MailTemplateEditor\Controller\MailTemplateController::edit')->bind('plugin_MailTemplateEditor_mail_edit');
+        $admin->put('/plugin/mailtemplateeditor/mail/{name}/reedit', 'Plugin\MailTemplateEditor\Controller\MailTemplateController::reedit')->bind('plugin_MailTemplateEditor_mail_reedit');
 
         $app->mount('/'.trim($app['config']['admin_route'], '/').'/', $admin);
 
@@ -52,7 +52,7 @@ class MailTemplateEditorServiceProvider implements ServiceProviderInterface
             $config['nav'][3]['child'][] = array(
                 'id' => 'mail',
                 'name' => 'メール管理',
-                'url' => 'admin_content_mail',
+                'url' => 'plugin_MailTemplateEditor_mail',
             );
 
             return $config;

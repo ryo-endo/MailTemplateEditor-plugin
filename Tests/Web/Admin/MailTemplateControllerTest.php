@@ -19,7 +19,7 @@ class MailTemplateControllerTest extends AbstractAdminWebTestCase
     {
         $client = $this->client;
         $client->request('GET',
-            $this->app->url('admin_content_mail')
+            $this->app->url('plugin_MailTemplateEditor_mail')
         );
         $this->assertTrue($client->getResponse()->isSuccessful());
     }
@@ -29,7 +29,7 @@ class MailTemplateControllerTest extends AbstractAdminWebTestCase
         $client = $this->client;
 
         $client->request('GET',
-            $this->app->url('admin_content_mail_edit', array('name' => 'order.twig'))
+            $this->app->url('plugin_MailTemplateEditor_mail_edit', array('name' => 'order.twig'))
         );
         $this->assertTrue($client->getResponse()->isSuccessful());
     }
@@ -41,7 +41,7 @@ class MailTemplateControllerTest extends AbstractAdminWebTestCase
 
         $client->request(
             'POST',
-            $this->app->url('admin_content_mail_edit', array('name' => 'order.twig')),
+            $this->app->url('plugin_MailTemplateEditor_mail_edit', array('name' => 'order.twig')),
             array(
                 'admin_mail_template' => array(
                     'tpl_data' => 'testtest',
@@ -51,7 +51,7 @@ class MailTemplateControllerTest extends AbstractAdminWebTestCase
             )
         );
 
-        $this->assertTrue($client->getResponse()->isRedirect($this->app->url('admin_content_mail_edit', array('name' => 'order.twig'))));
+        $this->assertTrue($client->getResponse()->isRedirect($this->app->url('plugin_MailTemplateEditor_mail_edit', array('name' => 'order.twig'))));
 
         $this->expected = 'testtest';
         $this->actual = file_get_contents($this->app['config']['template_realdir'].'/Mail/order.twig');
@@ -65,7 +65,7 @@ class MailTemplateControllerTest extends AbstractAdminWebTestCase
 
         $crawler = $client->request(
             'PUT',
-            $this->app->url('admin_content_mail_reedit', array('name' => 'order.twig'))
+            $this->app->url('plugin_MailTemplateEditor_mail_reedit', array('name' => 'order.twig'))
         );
 
         $this->assertTrue($client->getResponse()->isSuccessful());
