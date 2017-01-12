@@ -7,12 +7,12 @@ cache:
     - $HOME/.composer/cache
 
 php:
-  - 7.1
-  - 7.0
-  - 5.6
-  - 5.5
-  - 5.4
   - 5.3
+  - 5.4
+  - 5.5
+  - 5.6
+  - 7.0
+  - 7.1
 
 env:
   # plugin code
@@ -76,8 +76,10 @@ before_script:
   # update composer
   - composer selfupdate
   - composer install --dev --no-interaction -o
-  # install ec-cube
-  - php eccube_install.php $DB none -V
+ # install ec-cube
+  - sh -c "if [ '$DB' = 'mysql' ]; then sh ./eccube_install.sh mysql none; fi"
+  - sh -c "if [ '$DB' = 'pgsql' ]; then sh ./eccube_install.sh pgsql none; fi"
+  - sh -c "if [ '$DB' = 'sqlite' ]; then sh ./eccube_install.sh sqlite3 none; fi"
   # install plugin
   - php app/console plugin:develop install --path=${HOME}/${PLUGIN_CODE}.tar.gz
   # enable plugin
