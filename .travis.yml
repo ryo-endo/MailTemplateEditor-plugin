@@ -19,8 +19,6 @@ env:
   global:
     PLUGIN_CODE=MailTemplateEditor
   matrix:
-      # for coverrage
-      - ECCUBE_VERSION=master DB=pgsql USER=postgres DBNAME=myapp_test DBPASS=password DBUSER=postgres COVERRAGE=true
       # ec-cube master
       - ECCUBE_VERSION=master DB=mysql USER=root DBNAME=myapp_test DBPASS=' ' DBUSER=root
       - ECCUBE_VERSION=master DB=pgsql USER=postgres DBNAME=myapp_test DBPASS=password DBUSER=postgres
@@ -48,22 +46,35 @@ env:
 
 matrix:
   fast_finish: true
-  exclude:
-    - php: 7.1
-      env: ECCUBE_VERSION=master DB=pgsql USER=postgres DBNAME=myapp_test DBPASS=password DBUSER=postgres COVERRAGE=true
-    - php: 5.6
-      env: ECCUBE_VERSION=master DB=pgsql USER=postgres DBNAME=myapp_test DBPASS=password DBUSER=postgres COVERRAGE=true
-    - php: 5.5
-      env: ECCUBE_VERSION=master DB=pgsql USER=postgres DBNAME=myapp_test DBPASS=password DBUSER=postgres COVERRAGE=true
-    - php: 5.4
-      env: ECCUBE_VERSION=master DB=pgsql USER=postgres DBNAME=myapp_test DBPASS=password DBUSER=postgres COVERRAGE=true
-    - php: 5.3
-      env: ECCUBE_VERSION=master DB=pgsql USER=postgres DBNAME=myapp_test DBPASS=password DBUSER=postgres COVERRAGE=true
   allow_failures:
     - php: 7.0
       env: ECCUBE_VERSION=master DB=pgsql USER=postgres DBNAME=myapp_test DBPASS=password DBUSER=postgres COVERRAGE=true
     - env: ECCUBE_VERSION=master DB=sqlite
     - env: ECCUBE_VERSION=3.0.13 DB=sqlite
+   -  php: 7.0
+      env: ECCUBE_VERSION=3.0.9 DB=mysql USER=root DBNAME=myapp_test DBPASS=' ' DBUSER=root
+   -  php: 7.0
+      env: ECCUBE_VERSION=3.0.9 DB=pgsql USER=postgres DBNAME=myapp_test DBPASS=password DBUSER=postgres
+   -  php: 7.0
+      env: ECCUBE_VERSION=3.0.9 DB=sqlite
+   -  php: 7.0
+      env: ECCUBE_VERSION=3.0.10 DB=mysql USER=root DBNAME=myapp_test DBPASS=' ' DBUSER=root
+   -  php: 7.0
+      env: ECCUBE_VERSION=3.0.10 DB=pgsql USER=postgres DBNAME=myapp_test DBPASS=password DBUSER=postgres
+   -  php: 7.0
+      env: ECCUBE_VERSION=3.0.10 DB=sqlite
+   -  php: 7.1
+      env: ECCUBE_VERSION=3.0.9 DB=mysql USER=root DBNAME=myapp_test DBPASS=' ' DBUSER=root
+   -  php: 7.1
+      env: ECCUBE_VERSION=3.0.9 DB=pgsql USER=postgres DBNAME=myapp_test DBPASS=password DBUSER=postgres
+   -  php: 7.1
+      env: ECCUBE_VERSION=3.0.9 DB=sqlite
+   -  php: 7.1
+      env: ECCUBE_VERSION=3.0.10 DB=mysql USER=root DBNAME=myapp_test DBPASS=' ' DBUSER=root
+   -  php: 7.1
+      env: ECCUBE_VERSION=3.0.10 DB=pgsql USER=postgres DBNAME=myapp_test DBPASS=password DBUSER=postgres
+   -  php: 7.1
+      env: ECCUBE_VERSION=3.0.10 DB=sqlite
 
 before_script:
   # archive plugin
@@ -87,8 +98,8 @@ before_script:
 
 script:
   # exec phpunit on ec-cube
-  - if [[ ! $COVERRAGE = 'true' ]]; then phpunit app/Plugin/${PLUGIN_CODE}/Tests; fi
-  - if [[ $COVERRAGE = 'true' ]]; then ./vendor/bin/phpunit -c app/Plugin/${PLUGIN_CODE}/phpunit.xml.dist --coverage-clover=coverage.clover; fi
+  - phpunit app/Plugin/${PLUGIN_CODE}/Tests
+  - if [[ $TRAVIS_PHP_VERSION =~ ^[7] ]]; then ./vendor/bin/phpunit -c app/Plugin/${PLUGIN_CODE}/phpunit.xml.dist --coverage-clover=coverage.clover ; fi
 
 after_script:
   # disable plugin
@@ -102,4 +113,4 @@ after_script:
 
 after_success:
   # for coveralls
-  - if [[ $COVERRAGE = 'true' ]]; then php vendor/bin/coveralls -v -x coverage.clover; fi
+  - if [[ $TRAVIS_PHP_VERSION =~ ^[7] ]]; then php vendor/bin/coveralls -v -x coverage.clover ; fi
