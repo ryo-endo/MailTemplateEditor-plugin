@@ -21,6 +21,13 @@ use Symfony\Component\HttpFoundation\Request;
 class MailTemplateController extends AbstractController
 {
 
+    /**
+     * メールファイル管理一覧画面
+     *
+     * @param Application $app
+     * @param Request $request
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function index(Application $app, Request $request)
     {
         // Mailディレクトリ(app/template、Resource/template)からメールファイルを取得
@@ -39,13 +46,20 @@ class MailTemplateController extends AbstractController
             }
         }
 
-
         return $app->render('MailTemplateEditor/Resource/template/admin/mail.twig', array(
             'files' => $files,
         ));
 
     }
 
+    /**
+     * メール編集画面
+     *
+     * @param Application $app
+     * @param Request $request
+     * @param $name
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     */
     public function edit(Application $app, Request $request, $name)
     {
 
@@ -104,6 +118,14 @@ class MailTemplateController extends AbstractController
         ));
     }
 
+    /**
+     * メールファイル初期化処理
+     *
+     * @param Application $app
+     * @param Request $request
+     * @param $name
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     */
     public function reedit(Application $app, Request $request, $name)
     {
 
