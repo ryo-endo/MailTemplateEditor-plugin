@@ -16,13 +16,11 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 class MailTemplateType extends AbstractType
 {
-
     /**
      * {@inheritdoc}
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-
         $builder
             ->add('tpl_data', 'textarea', array(
                 'label' => 'メール本文',

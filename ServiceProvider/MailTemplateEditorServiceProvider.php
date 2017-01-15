@@ -10,16 +10,13 @@
 
 namespace Plugin\MailTemplateEditor\ServiceProvider;
 
-use Eccube\Application;
 use Eccube\Common\Constant;
-use Plugin\MailTemplateEditor\Form\Type\MailTemplateEditorConfigType;
 use Plugin\MailTemplateEditor\Form\Type\MailTemplateType;
 use Silex\Application as BaseApplication;
 use Silex\ServiceProviderInterface;
 
 class MailTemplateEditorServiceProvider implements ServiceProviderInterface
 {
-
     public function register(BaseApplication $app)
     {
 
@@ -57,11 +54,9 @@ class MailTemplateEditorServiceProvider implements ServiceProviderInterface
 
             return $config;
         }));
-
     }
 
     public function boot(BaseApplication $app)
     {
     }
-
 }
