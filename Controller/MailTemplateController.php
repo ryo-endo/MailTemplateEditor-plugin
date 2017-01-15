@@ -20,12 +20,12 @@ use Symfony\Component\HttpFoundation\Request;
 
 class MailTemplateController extends AbstractController
 {
-
     /**
-     * メールファイル管理一覧画面
+     * メールファイル管理一覧画面.
      *
      * @param Application $app
-     * @param Request $request
+     * @param Request     $request
+     *
      * @return \Symfony\Component\HttpFoundation\Response
      */
     public function index(Application $app, Request $request)
@@ -49,20 +49,19 @@ class MailTemplateController extends AbstractController
         return $app->render('MailTemplateEditor/Resource/template/admin/mail.twig', array(
             'files' => $files,
         ));
-
     }
 
     /**
-     * メール編集画面
+     * メール編集画面.
      *
      * @param Application $app
-     * @param Request $request
+     * @param Request     $request
      * @param $name
+     *
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
     public function edit(Application $app, Request $request, $name)
     {
-
         $readPaths = array(
             $app['config']['template_realdir'],
             $app['config']['template_default_realdir'],
@@ -119,16 +118,16 @@ class MailTemplateController extends AbstractController
     }
 
     /**
-     * メールファイル初期化処理
+     * メールファイル初期化処理.
      *
      * @param Application $app
-     * @param Request $request
+     * @param Request     $request
      * @param $name
+     *
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
     public function reedit(Application $app, Request $request, $name)
     {
-
         $this->isTokenValid($app);
 
         $readPaths = array(
@@ -170,5 +169,4 @@ class MailTemplateController extends AbstractController
             'form' => $form->createView(),
         ));
     }
-
 }

@@ -14,7 +14,6 @@ use Eccube\Tests\Web\Admin\AbstractAdminWebTestCase;
 
 class MailTemplateControllerTest extends AbstractAdminWebTestCase
 {
-
     public function testRoutingAdminContentMail()
     {
         $client = $this->client;
@@ -34,7 +33,6 @@ class MailTemplateControllerTest extends AbstractAdminWebTestCase
         $this->assertTrue($client->getResponse()->isSuccessful());
     }
 
-
     public function testRoutingAdminContentMailEdit()
     {
         $client = $this->client;
@@ -45,9 +43,9 @@ class MailTemplateControllerTest extends AbstractAdminWebTestCase
             array(
                 'admin_mail_template' => array(
                     'tpl_data' => 'testtest',
-                    '_token' => 'dummy'
+                    '_token' => 'dummy',
                 ),
-                'name' => 'order.twig'
+                'name' => 'order.twig',
             )
         );
 
@@ -57,7 +55,6 @@ class MailTemplateControllerTest extends AbstractAdminWebTestCase
         $this->actual = file_get_contents($this->app['config']['template_realdir'].'/Mail/order.twig');
         $this->verify();
     }
-
 
     public function testRoutingAdminContentMailReEdit()
     {
@@ -74,5 +71,4 @@ class MailTemplateControllerTest extends AbstractAdminWebTestCase
         $this->actual = file_get_contents($this->app['config']['template_realdir'].'/Mail/order.twig');
         $this->verify();
     }
-
 }
